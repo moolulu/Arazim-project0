@@ -5,6 +5,9 @@ from threading import Thread
 
 
 def receiver(conn):
+    """
+    Receive data from client at address (ip, port).
+    """
     from_client = ""
     while True:
         data = conn.recv(4096)
@@ -16,23 +19,18 @@ def receiver(conn):
 
 def run_server(client_ip, client_port):
     """
-    Receive data from client at address (ip, port).
+    Listens to client address and creates a threads to receive messages.
     """
     serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     serv.bind((client_ip, client_port))
     serv.listen(5)
     while True:
         conn, addr = serv.accept()
-
         t = Thread(target=receiver, args=[conn])
         t.start()
         print(f"Message from thread {t.native_id}.")
-        #t.run()
         t.join()
         conn.close()
-
-        #receiver(conn)
-        #conn.close()
 
 
 def connections():
@@ -42,14 +40,6 @@ def connections():
     while True:
         args = get_args()
         try:
-            """
-            t = Thread(target=run_server, args=[args.client_ip, args.client_port])
-            t.start()
-            t.run()
-            print(f"Message from thread {t.native_id}.")
-            t.join()
-            print("Done.")
-            """
             run_server(args.client_ip, args.client_port)
             print("Done.")
         except Exception as error:
